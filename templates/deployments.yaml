@@ -1,0 +1,3 @@
+{{- include "yauhc.deployment" (list . "yauhc.deployments") -}}
+{{- define "yauhc.deployments" -}}
+{{- end -}}

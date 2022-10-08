@@ -1,0 +1,7 @@
+# default values for subchart
+global: {}
+generic:
+  enable: true
+  annotations: {}
+  labels: {}
+  env: []

@@ -1,0 +1,7 @@
+{{- $global := .Values.global -}}
+{{- $generic := .Values.generic -}}
+{{- $app := .Values -}}
+{{- $appConfigs := (include "yauhc.util.merger" (list $app.configs $generic.configs $global.configs)) -}}
+{{- if $appConfigs -}}
+{{- include "yauhc.configmap.tpl" . -}}
+{{- end -}}

@@ -1,0 +1,105 @@
+{{- define "yauhc.deployment.tpl" -}}
+{{- $global := .Values.global -}}
+{{- $generic := .Values.generic -}}
+{{- $app := .Values -}}
+{{- if (include "yauhc.util.selecter" (list $app.enable $generic.enable $global.enable)) -}}
+{{- $appName := (include "yauhc.util.selecter" (list $app.name $generic.name $global.name .Release.Name .Chart.Name)) -}}
+{{- $appLabels := dict "app" $appName -}}
+{{- $configmapExt := (include "yauhc.util.selecter" (list $app.configmapName $generic.configmapName $global.configmapName "settings")) -}}
+{{- $configmapMountPath := (include "yauhc.util.selecter" (list $app.configPath $generic.configPath $global.configPath (printf "/etc/%s" $appName ))) -}}
+{{- $appConfigs := (include "yauhc.util.merger" (list $app.configs $generic.configs $global.configs)) -}}
+{{- $configmap_sha := (toJson $appConfigs | sha256sum) -}}
+{{- $containerAnnotations := dict "checksum/config" $configmap_sha -}}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $appName }}
+  labels:
+    {{- with (include "yauhc.util.merger" (list $appLabels $app.labels $generic.labels $global.labels)) }}
+      {{- . | nindent 8 -}}
+    {{- end}}
+  {{- with (include "yauhc.util.merger" (list $app.annotations $generic.annotations $global.annotations)) }}
+  annotations:
+    {{- . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with (include "yauhc.util.selecter" (list $app.revisionHistoryLimit $generic.revisionHistoryLimit $global.revisionHistoryLimit)) }}
+  revisionHistoryLimit: {{ . }}
+  {{- end }}
+  {{- with (include "yauhc.util.selecter" (list $app.replicaCount $generic.replicaCount $global.replicaCount)) }}
+  replicas: {{ . }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ $appName }}
+  {{- with (include "yauhc.util.merger" (list $app.strategy $generic.strategy $global.strategy)) }}
+  strategy:
+      {{- . | nindent 4 }}
+  {{- end }}
+  template:
+    metadata:
+      {{- with (include "yauhc.util.merger" (list $containerAnnotations $app.annotations $generic.annotations $global.annotations)) }}
+      annotations:
+          {{- . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- with (include "yauhc.util.merger" (list $appLabels $app.labels $generic.labels $global.labels)) }}
+            {{- . | nindent 8 -}}
+        {{- end}}
+    spec:
+      {{- if $appConfigs }}
+      volumes:
+        - name: {{ $appName }}-configmap
+          configMap:
+            name: {{ $appName }}-configmap-{{ $configmapExt }}
+      {{- end }}
+      {{- with (include "yauhc.util.selecter" (list $app.imagePullSecrets $generic.imagePullSecrets $global.imagePullSecrets)) }}
+      imagePullSecrets:
+        - name: {{ . }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ include "yauhc.util.selecter" (list $app.terminationGracePeriodSeconds $generic.terminationGracePeriodSeconds $global.terminationGracePeriodSeconds 30) }}
+      containers:
+        - name: {{ $appName }}
+          imagePullPolicy: {{ include "yauhc.util.selecter" (list $app.imagePullPolicy $generic.imagePullPolicy $global.imagePullPolicy "IfNotPresent") }}
+          image: {{ include "yauhc.util.selecter" (list $app.image $generic.image $global.image) }}
+          command: {{ include "yauhc.util.selecter" (list $app.command $generic.command $global.command) }}
+          {{- with (include "yauhc.util.merger" (list $app.env $generic.env $global.env)) }}
+          env:
+            {{- range $name, $value := fromYaml . }}
+            - name: {{ $name }}
+              value: {{ $value | quote }}
+            {{- end }}
+          {{- end }}
+          {{- if $appConfigs }}
+          volumeMounts:
+            - name: {{ $appName }}-configmap
+              mountPath: {{ $configmapMountPath }}
+              readOnly: true
+          {{- end }}
+          {{- with (include "yauhc.util.merger" (list $app.readinessProbe $generic.readinessProbe $global.readinessProbe)) }}
+          readinessProbe: {{ . | nindent 12}}
+          {{- end }}
+          {{- with (include "yauhc.util.merger" (list $app.livenessProbe $generic.livenessProbe $global.livenessProbe)) }}
+          livenessProbe: {{ . | nindent 12}}
+          {{- end }}
+          {{- with (include "yauhc.util.merger" (list $app.startupProbe $generic.startupProbe $global.startupProbe)) }}
+          startupProbe: {{ . | nindent 12}}
+          {{- end }}
+          {{- with (include "yauhc.util.merger" (list $app.resources $generic.resources $global.resources)) }}
+          resources: {{ . | nindent 12}}
+          {{- end }}
+      {{- with (include "yauhc.util.merger" (list $app.nodeSelector $generic.nodeSelector $global.nodeSelector)) }}
+      nodeSelector: {{ . | nindent 8}}
+      {{- end }}
+      {{- with (include "yauhc.util.merger" (list $app.affinity $generic.affinity $global.affinity)) }}
+      affinity: {{ . | nindent 8}}
+      {{- end }}
+      {{- with (include "yauhc.util.merger" (list $app.tolerations $generic.tolerations $global.tolerations)) }}
+      tolerations: {{ . | nindent 8}}
+      {{- end }}
+{{- end -}}
+{{- end -}}
+{{- define "yauhc.deployment" -}}
+{{- include "yauhc.util.merge" (append . "yauhc.deployment.tpl") -}}
+{{- end -}}
