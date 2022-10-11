@@ -1,5 +1,7 @@
 {{- $global := .Values.global -}}
 {{- $generic := .Values.generic -}}
+{{- $values := .Values -}}
+{{- $capabilities := .Capabilities -}}
 {{- $release := .Release -}}
 {{- $chart := .Chart -}}
 {{ range $i, $deployment := .Values.deployments }}
@@ -7,6 +9,8 @@
 {{- $_ = set $deployment "global" $global -}}
 {{- $_ = set $deployment "Release" $release -}}
 {{- $_ = set $deployment "Chart" $chart -}}
+{{- $_ = set $deployment "Values" $values -}}
+{{- $_ = set $deployment "Capabilities" $capabilities -}}
 {{- if not $deployment.name -}}
 {{- $_ = set $deployment "name" (printf "%s-%d" $release.Name $i) -}}
 {{- end -}}
