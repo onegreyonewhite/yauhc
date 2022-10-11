@@ -38,4 +38,5 @@ For deployments with `port` parameter automatically creates service with same po
 | `configs`                       | no       | yes     | Dict with filenames and their content.                       | `{}`                                       |
 | `configPath`                    | no       | yes     | Path in container where configs will mounted.                | `/etc/{name}`                              |
 | `port`                          | no       | yes     | Port exposed from container in deployment.                   | ``                                         |
+| `portType`                      | no       | yes     | Type of a service.                                           | ``                                         |
 | `serviceAnnotations`            | no       | yes     | Annotations to add to services for deployment.               | `{}`                                       |

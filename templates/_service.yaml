@@ -17,6 +17,9 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+  {{- with (include "yauhc.util.selecter" (list $app.portType $generic.portType $global.portType)) }}
+  type: {{ . }}
+  {{- end }}
   selector:
     app: {{ $appName }}
   ports:

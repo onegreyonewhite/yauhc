@@ -14,7 +14,7 @@
 {{- $_ := set $containerAnnotations "checksum/config" (toJson $appConfigs | sha256sum) -}}
 {{- end -}}
 ---
-apiVersion: apps/v1
+apiVersion: {{ include "capabilities.deployment.apiVersion" $ }}
 kind: Deployment
 metadata:
   name: {{ $appName }}
