@@ -1,3 +1,22 @@
-{{- include "yauhc.deployment" (list . "yauhc.deployments") -}}
-{{- define "yauhc.deployments" -}}
+{{- $global := .Values.global -}}
+{{- $generic := .Values.generic -}}
+{{- $release := .Release -}}
+{{- $chart := .Chart -}}
+{{ range $i, $deployment := .Values.deployments }}
+{{- $_ := set $deployment "generic" $generic -}}
+{{- $_ = set $deployment "global" $global -}}
+{{- $_ = set $deployment "Release" $release -}}
+{{- $_ = set $deployment "Chart" $chart -}}
+{{- if not $deployment.name -}}
+{{- $_ = set $deployment "name" (printf "%s-%d" $release.Name $i) -}}
 {{- end -}}
+
+{{ include "yauhc.deployment.tpl" $deployment }}
+
+{{- $appConfigs := (include "yauhc.util.merger" (list $deployment.configs $generic.configs $global.configs)) }}
+
+{{- with $appConfigs }}
+{{ include "yauhc.configmap.tpl" $deployment }}
+{{- end }}
+
+{{ end }}

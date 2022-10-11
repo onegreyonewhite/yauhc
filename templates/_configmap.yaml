@@ -1,10 +1,11 @@
-{{- define "yauhc.configmap.tpl" -}}
-{{- $global := .Values.global -}}
-{{- $generic := .Values.generic -}}
-{{- $app := .Values -}}
+{{- define "yauhc.configmap.tpl" }}
+{{- $global :=  (.global | default dict) -}}
+{{- $generic := (.generic | default dict) -}}
+{{- $app := . -}}
 {{- $appConfigs := (include "yauhc.util.merger" (list $app.configs $generic.configs $global.configs)) -}}
-{{- $appName := (include "yauhc.util.selecter" (list $app.name $generic.name $global.name .Release.Name .Chart.Name)) -}}
+{{- $appName := $app.name -}}
 {{- $configmapExt := (include "yauhc.util.selecter" (list $app.configmapName $generic.configmapName $global.configmapName "settings")) -}}
+{{- if and ($appName) ($appConfigs) }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -14,6 +15,7 @@ metadata:
     app: {{ $appName }}
 data:
   {{ $appConfigs }}
+{{- end }}
 {{- end }}
 {{- define "yauhc.configmap" -}}
 {{- include "yauhc.util.merge" (append . "yauhc.configmap.tpl") -}}

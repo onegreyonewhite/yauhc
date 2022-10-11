@@ -1,15 +1,18 @@
 {{- define "yauhc.deployment.tpl" -}}
-{{- $global := .Values.global -}}
-{{- $generic := .Values.generic -}}
-{{- $app := .Values -}}
-{{- if (include "yauhc.util.selecter" (list $app.enable $generic.enable $global.enable)) -}}
-{{- $appName := (include "yauhc.util.selecter" (list $app.name $generic.name $global.name .Release.Name .Chart.Name)) -}}
+{{- $global :=  (.global | default dict) -}}
+{{- $generic := (.generic | default dict) -}}
+{{- $app := . -}}
+{{- $appImage := (include "yauhc.util.selecter" (list $app.image $generic.image $global.image)) -}}
+{{- $appName := $app.name -}}
+{{- if and (include "yauhc.util.selecter" (list $app.enable $generic.enable $global.enable)) ($appImage) ($appName) }}
 {{- $appLabels := dict "app" $appName -}}
 {{- $configmapExt := (include "yauhc.util.selecter" (list $app.configmapName $generic.configmapName $global.configmapName "settings")) -}}
 {{- $configmapMountPath := (include "yauhc.util.selecter" (list $app.configPath $generic.configPath $global.configPath (printf "/etc/%s" $appName ))) -}}
 {{- $appConfigs := (include "yauhc.util.merger" (list $app.configs $generic.configs $global.configs)) -}}
-{{- $configmap_sha := (toJson $appConfigs | sha256sum) -}}
-{{- $containerAnnotations := dict "checksum/config" $configmap_sha -}}
+{{- $containerAnnotations := dict -}}
+{{- with $appConfigs -}}
+{{- $_ := set $containerAnnotations "checksum/config" (toJson $appConfigs | sha256sum) -}}
+{{- end -}}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -62,8 +65,10 @@ spec:
       containers:
         - name: {{ $appName }}
           imagePullPolicy: {{ include "yauhc.util.selecter" (list $app.imagePullPolicy $generic.imagePullPolicy $global.imagePullPolicy "IfNotPresent") }}
-          image: {{ include "yauhc.util.selecter" (list $app.image $generic.image $global.image) }}
-          command: {{ include "yauhc.util.selecter" (list $app.command $generic.command $global.command) }}
+          image: {{ $appImage }}
+          {{- with (include "yauhc.util.selecter" (list $app.command $generic.command $global.command)) }}
+          command: {{ . }}
+          {{- end }}
           {{- with (include "yauhc.util.merger" (list $app.env $generic.env $global.env)) }}
           env:
             {{- range $name, $value := fromYaml . }}
@@ -98,8 +103,9 @@ spec:
       {{- with (include "yauhc.util.merger" (list $app.tolerations $generic.tolerations $global.tolerations)) }}
       tolerations: {{ . | nindent 8}}
       {{- end }}
-{{- end -}}
-{{- end -}}
+
+{{- end }}
+{{- end }}
 {{- define "yauhc.deployment" -}}
 {{- include "yauhc.util.merge" (append . "yauhc.deployment.tpl") -}}
 {{- end -}}

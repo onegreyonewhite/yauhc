@@ -1,7 +1,6 @@
-# default values for subchart
+# default values for chart
 global: {}
 generic:
   enable: true
-  annotations: {}
-  labels: {}
-  env: []
+
+deployments: []
