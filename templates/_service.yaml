@@ -1,0 +1,30 @@
+{{- define "yauhc.service.tpl" }}
+{{- $global :=  (.global | default dict) -}}
+{{- $generic := (.generic | default dict) -}}
+{{- $app := . -}}
+{{- $appName := $app.name -}}
+{{- $appPort := (include "yauhc.util.selecter" (list $app.port $generic.port $global.port)) -}}
+{{- if and ($appName) ($appPort) }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $appName }}
+  labels:
+    app: {{ $appName }}
+  {{- with (include "yauhc.util.merger" (list $app.serviceAnnotations $generic.serviceAnnotations $global.serviceAnnotations)) }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    app: {{ $appName }}
+  ports:
+    - port: {{ $appPort }}
+      targetPort: {{ $appPort }}
+      protocol: TCP
+{{- end }}
+{{- end }}
+{{- define "yauhc.service" -}}
+{{- include "yauhc.util.merge" (append . "yauhc.service.tpl") -}}
+{{- end -}}

@@ -19,4 +19,6 @@
 {{ include "yauhc.configmap.tpl" $deployment }}
 {{- end }}
 
+{{ include "yauhc.service.tpl" $deployment }}
+
 {{ end }}

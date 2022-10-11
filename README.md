@@ -12,6 +12,7 @@ Core Philosophy: fewer parameters - faster setup.
 All deployments controlled by list of dicts named `deloyments`. Almost all values can be overrided with `generic` dict.
 Deployment's pods updates their annotations when content of configmaps updates too. If deployment doesn't have `image`
 parameter but have configs only configmap will be deployed. Without `configs` and `image` nothing will be deployed.
+For deployments with `port` parameter automatically creates service with same port and same selector.
 
 
 | Name                            | Required | Generic | Description                                                  | Value                                      |
@@ -35,4 +36,6 @@ parameter but have configs only configmap will be deployed. Without `configs` an
 | `affinity`                      | no       | yes     | Affinity for deployment; replicas pods assignment.           | `{}`                                       |
 | `tolerations`                   | no       | yes     | Tolerations for deployment; replicas pods assignment.        | `{}`                                       |
 | `configs`                       | no       | yes     | Dict with filenames and their content.                       | `{}`                                       |
-| `configPath`                    | no       | yes     | Path in container where configs will mounted.                | `{}`                                       |
+| `configPath`                    | no       | yes     | Path in container where configs will mounted.                | `/etc/{name}`                              |
+| `port`                          | no       | yes     | Port exposed from container in deployment.                   | ``                                         |
+| `serviceAnnotations`            | no       | yes     | Annotations to add to services for deployment.               | `{}`                                       |
