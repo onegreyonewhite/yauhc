@@ -21,3 +21,13 @@
 {{- print "apps/v1" -}}
 {{- end -}}
 {{- end -}}
+
+{{- define "capabilities.ingress.apiVersion" -}}
+{{- if semverCompare "<1.14-0" (include "capabilities.kubeVersion" $) -}}
+{{- print "extensions/v1beta1" -}}
+{{- else if semverCompare "<1.19-0" (include "capabilities.kubeVersion" $) -}}
+{{- print "networking.k8s.io/v1beta1" -}}
+{{- else -}}
+{{- print "networking.k8s.io/v1" -}}
+{{- end }}
+{{- end -}}

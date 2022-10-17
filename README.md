@@ -37,6 +37,9 @@ For deployments with `port` parameter automatically creates service with same po
 | `tolerations`                   | no       | yes     | Tolerations for deployment; replicas pods assignment.        | `{}`                                       |
 | `configs`                       | no       | yes     | Dict with filenames and their content.                       | `{}`                                       |
 | `configPath`                    | no       | yes     | Path in container where configs will mounted.                | `/etc/{name}`                              |
+| `configmapSuffix`               | no       | yes     | Additional suffix for configmap name.                        | `settings`                                 |
 | `port`                          | no       | yes     | Port exposed from container in deployment.                   | ``                                         |
 | `portType`                      | no       | yes     | Type of a service.                                           | ``                                         |
 | `serviceAnnotations`            | no       | yes     | Annotations to add to services for deployment.               | `{}`                                       |
+| `domain`                        | no       | yes     | Domain name for deployment's ingress.                        | `''`                                       |
+| `issuer`                        | no       | yes     | Name of cert-manager's issuer for ingress tls.               | `''`                                       |

@@ -11,6 +11,7 @@ This takes an array of three values:
 {{- $tpl := fromYaml (include (index . 2) $top) | default (dict ) -}}
 {{- toYaml (merge $overrides $tpl) -}}
 {{- end -}}
+
 {{- /*
 yauhc.util.getter will get first existing value and output result.
 This takes an array of values and take only first.
@@ -25,6 +26,7 @@ This takes an array of values and take only first.
 {{- end -}}
 {{- end -}}
 {{- end -}}
+
 {{- /*
 yauhc.util.getter will merge multiple values and output result.
 This takes an array of three values and return result.
@@ -35,6 +37,24 @@ This takes an array of three values and return result.
 {{- $global := (index . 2) | default (dict ) -}}
 {{- $result := merge $val $generic $global -}}
 {{- if $result -}}
-{{- toYaml ($result) -}}
+{{- toYaml $result -}}
 {{- end -}}
+{{- end -}}
+
+{{- /*
+yauhc.util.getter will merge multiple values and output result.
+This takes an array of three values and return result.
+*/}}
+{{- define "yauhc.util.makename" -}}
+{{- $prefix := (index . 0) -}}
+{{- $cur_values := (index . 1) | default (dict ) -}}
+{{- $release := (index . 2) | default (dict ) -}}
+{{- $name := "application" -}}
+{{- if $cur_values.name -}}
+{{- $name = $cur_values.name -}}
+{{- else if $release.name -}}
+{{- $name = $release.name -}}
+{{- end -}}
+{{- $result := printf "%s-%s" $prefix $name -}}
+{{- toYaml ($result) -}}
 {{- end -}}

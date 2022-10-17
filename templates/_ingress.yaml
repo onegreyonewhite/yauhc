@@ -1,0 +1,56 @@
+{{- define "yauhc.ingress.tpl" }}
+{{- $global :=  (.global | default dict) -}}
+{{- $generic := (.generic | default dict) -}}
+{{- $app := . -}}
+{{- $appName := $app.name -}}
+{{- $appPaths := $app.serviceMap -}}
+{{- $appDomain := $app.domain -}}
+{{- $annotations := ((include "yauhc.util.merger" (list $app.ingressAnnotations $generic.ingressAnnotations $global.ingressAnnotations)) | default dict) -}}
+{{- $issuerName := (include "yauhc.util.selecter" (list $app.issuer $generic.issuer $global.issuer)) -}}
+{{- $ingresSecret := (include "yauhc.util.selecter" (list $app.ingressSecret $generic.ingressSecret $global.ingressSecret)) -}}
+{{- if $issuerName -}}
+{{- $issuerName := $issuerName -}}
+{{- $__ := set $annotations "cert-manager.io/issuer" $issuerName -}}
+{{- if not $ingresSecret -}}
+{{- $ingresSecret = (printf "%s-%s" $issuerName $appName) -}}
+{{- end -}}
+{{- end -}}
+{{- if and ($appName) ($appPaths) }}
+---
+apiVersion: {{ include "capabilities.ingress.apiVersion" $ }}
+kind: Ingress
+metadata:
+  name: {{ $appName }}
+  {{- with $annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if $ingresSecret }}
+  tls:
+    - hosts:
+        - {{ $appDomain }}
+      secretName: {{ $ingresSecret }}
+  {{- end }}
+  rules:
+    {{- with $appPaths }}
+    - host: "{{ $appDomain }}"
+      http:
+        paths:
+          {{- range $service := $appPaths }}
+          {{- if and $service.path $service.name $service.port }}
+          - path: {{ $service.path }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $service.name }}
+                port:
+                  number: {{ $service.port }}
+          {{- end }}
+          {{- end }}
+    {{- end }}
+{{- end }}
+{{- end }}
+{{- define "yauhc.ingress" -}}
+{{- include "yauhc.util.merge" (append . "yauhc.ingress.tpl") -}}
+{{- end -}}

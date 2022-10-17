@@ -25,4 +25,12 @@
 
 {{ include "yauhc.service.tpl" $deployment }}
 
+{{- $appPort :=  (include "yauhc.util.selecter" (list $deployment.port $generic.port $global.port)) }}
+
+{{- if and $deployment.name $appPort $deployment.domain }}
+{{- $ingressMap := dict "path" "/" "name" $deployment.name "port" $appPort }}
+{{- $_ = set $deployment "serviceMap" (list $ingressMap) }}
+{{ include "yauhc.ingress.tpl" $deployment }}
+{{- end }}
+
 {{ end }}

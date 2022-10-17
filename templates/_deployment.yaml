@@ -6,7 +6,7 @@
 {{- $appName := $app.name -}}
 {{- if and (include "yauhc.util.selecter" (list $app.enable $generic.enable $global.enable)) ($appImage) ($appName) }}
 {{- $appLabels := dict "app" $appName -}}
-{{- $configmapExt := (include "yauhc.util.selecter" (list $app.configmapName $generic.configmapName $global.configmapName "settings")) -}}
+{{- $configmapExt := (include "yauhc.util.selecter" (list $app.configmapSuffix $generic.configmapSuffix $global.configmapSuffix "settings")) -}}
 {{- $configmapMountPath := (include "yauhc.util.selecter" (list $app.configPath $generic.configPath $global.configPath (printf "/etc/%s" $appName ))) -}}
 {{- $appConfigs := (include "yauhc.util.merger" (list $app.configs $generic.configs $global.configs)) -}}
 {{- $containerAnnotations := dict -}}
