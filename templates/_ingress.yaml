@@ -15,7 +15,7 @@
 {{- $ingresSecret = (printf "%s-%s" $issuerName $appName) -}}
 {{- end -}}
 {{- end -}}
-{{- if and ($appName) ($appPaths) }}
+{{- if and ($appDomain) ($appName) ($appPaths) }}
 ---
 apiVersion: {{ include "capabilities.ingress.apiVersion" $ }}
 kind: Ingress

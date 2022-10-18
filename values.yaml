@@ -4,3 +4,5 @@ generic:
   enable: true
 
 deployments: []
+
+multi_endpoint: {}

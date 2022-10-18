@@ -43,3 +43,13 @@ For deployments with `port` parameter automatically creates service with same po
 | `serviceAnnotations`            | no       | yes     | Annotations to add to services for deployment.               | `{}`                                       |
 | `domain`                        | no       | yes     | Domain name for deployment's ingress.                        | `''`                                       |
 | `issuer`                        | no       | yes     | Name of cert-manager's issuer for ingress tls.               | `''`                                       |
+| `endpointPath`                  | no       | yes     | Name of path for microservice style ingress.                 | `''`                                       |
+
+#### Examples
+
+`samples` contains examples for some deployment cases.
+
+- `samples/simple_https_service.yaml` - An example of how to deploy a simple http service with tls 
+  (with cert-manager and issuer installed)
+- `samples/simple_https_microservices.yaml` - An example of how to deploy multiple services and connect
+  them in one endpoint behind an https proxy (with cert-manager and issuer installed).

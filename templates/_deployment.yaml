@@ -20,7 +20,7 @@ metadata:
   name: {{ $appName }}
   labels:
     {{- with (include "yauhc.util.merger" (list $appLabels $app.labels $generic.labels $global.labels)) }}
-      {{- . | nindent 8 -}}
+      {{- . | nindent 4 -}}
     {{- end}}
   {{- with (include "yauhc.util.merger" (list $app.annotations $generic.annotations $global.annotations)) }}
   annotations:

@@ -1,0 +1,22 @@
+generic:
+  image: hashicorp/http-echo:0.2.3
+  port: 5678
+
+multi_endpoint:
+  # Must be deployed manually
+  issuer: le-test-issuer
+  domain: api.example.com
+
+deployments:
+  - name: svc1
+    command: "-text=\"{\"Name\": \"Service 1\"}\""
+    endpointPath: /service1/
+
+  - name: svc2
+    command: "-text=\"{\"Name\": \"Service 2\"}\""
+    endpointPath: /service1/
+
+  - name: svc3
+    command: "-listen=:8080 -text=\"{\"Name\": \"Service 3\"}\""
+    port: 8080
+    endpointPath: /service1/
