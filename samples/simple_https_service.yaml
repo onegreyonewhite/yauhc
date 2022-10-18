@@ -3,7 +3,7 @@ generic:
   issuer: le-test-issuer
 
 deployments:
-  - name: nginx-example
+  nginx-example:
     image: nginx:1.23.1
     port: 80
     domain: www.example.com

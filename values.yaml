@@ -3,6 +3,6 @@ global: {}
 generic:
   enable: true
 
-deployments: []
+deployments: {}
 
 multi_endpoint: {}

@@ -5,16 +5,14 @@
 {{- $release := .Release -}}
 {{- $chart := .Chart -}}
 {{- $endpoints := (list) -}}
-{{ range $i, $deployment := .Values.deployments }}
-{{- $_ := set $deployment "generic" $generic -}}
+{{ range $name, $deployment := .Values.deployments }}
+{{- $_ := set $deployment "name" $name -}}
+{{- $_ = set $deployment "generic" $generic -}}
 {{- $_ = set $deployment "global" $global -}}
 {{- $_ = set $deployment "Release" $release -}}
 {{- $_ = set $deployment "Chart" $chart -}}
 {{- $_ = set $deployment "Values" $values -}}
 {{- $_ = set $deployment "Capabilities" $capabilities -}}
-{{- if not $deployment.name -}}
-{{- $_ = set $deployment "name" (printf "%s-%d" $release.Name $i) -}}
-{{- end -}}
 
 {{ include "yauhc.deployment.tpl" $deployment }}
 
