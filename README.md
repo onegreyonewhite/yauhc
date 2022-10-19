@@ -5,6 +5,29 @@ It can be used both independently and as a dependent chart.
 
 Core Philosophy: fewer parameters - faster setup.
 
+## Usage
+
+```bash
+helm repo add yauhc https://gitlab.com/api/v4/projects/40345586/packages/helm/stable
+helm repo update
+helm update project yauhc -f ./values.yaml --install --wait
+```
+
+Where:
+- `https://gitlab.com/api/v4/projects/40345586/packages/helm/stable` - public helm repository.
+- `./values.yaml` - path to infrastructure's values.
+
+#### Examples
+
+`samples` contains examples for some deployment cases.
+
+- `samples/simple_https_service.yaml` - An example of how to deploy a simple http service with tls 
+  (with cert-manager and issuer installed)
+- `samples/simple_https_microservices.yaml` - An example of how to deploy multiple services and connect
+  them in one endpoint behind an https proxy (with cert-manager and issuer installed).
+
+
+
 ## Parameters
 
 ### Deployments parameters
