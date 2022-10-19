@@ -17,12 +17,15 @@ yauhc.util.getter will get first existing value and output result.
 This takes an array of values and take only first.
 */}}
 {{- define "yauhc.util.selecter" -}}
+{{- $ready := "false" -}}
 {{- range $val := . -}}
+{{- if eq $ready "false" -}}
 {{- if eq (typeOf $val) (typeOf nil) -}}
 {{- $_ := "" -}}
 {{- else -}}
 {{- toYaml $val -}}
-{{- break -}}
+{{- $ready = "true" -}}
+{{- end -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}
