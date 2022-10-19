@@ -19,7 +19,7 @@ This takes an array of values and take only first.
 {{- define "yauhc.util.selecter" -}}
 {{- range $val := . -}}
 {{- if eq (typeOf $val) (typeOf nil) -}}
-{{- continue -}}
+{{- $_ := "" -}}
 {{- else -}}
 {{- toYaml $val -}}
 {{- break -}}
