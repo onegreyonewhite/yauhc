@@ -17,5 +17,4 @@ upload:
     - helm plugin install https://github.com/chartmuseum/helm-push
     - helm repo add --username ${DEPLOY_USERNAME} --password ${DEPLOY_PASSWORD} ${CI_PROJECT_NAME} ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/helm/stable
   script:
-    - helm package .
     - helm cm-push . ${CI_PROJECT_NAME}
