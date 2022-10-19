@@ -33,7 +33,7 @@
 {{- end }}
 
 {{- if and ($deployment.name) ($appPort) ($deployment.endpointPath) }}
-{{- $endpoints = concat $endpoints (list $ingressMap) }}
+{{- $endpoints = concat $endpoints (list (merge (dict "path" $deployment.endpointPath) $ingressMap)) }}
 {{- end }}
 
 {{ end }}
