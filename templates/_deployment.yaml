@@ -69,7 +69,7 @@ spec:
           {{- with (include "yauhc.util.selecter" (list $app.command $generic.command $global.command)) }}
           command: {{ . }}
           {{- end }}
-          {{- with (include "yauhc.util.merger" (list $app.env $generic.env $global.env)) }}
+          {{- with (include "yauhc.util.merger" (list $app.env $generic.env (dict ))) }}
           env:
             {{- range $name, $value := fromYaml . }}
             - name: {{ $name }}
