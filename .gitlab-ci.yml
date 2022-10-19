@@ -1,13 +1,23 @@
-image: alpine/helm:3.10.1
+image: dtzar/helm-kubectl:3.5.3
 
 stages:
+  - lint
   - upload
+
+lint:
+  stage: lint
+  script:
+    - helm lint .
 
 upload:
   stage: upload
+  rules:
+    - if: '$CI_COMMIT_TAG =~ "/^$/"'
+      changes:
+        - Chart.yaml
   before_script:
     - helm plugin install https://github.com/chartmuseum/helm-push
     - helm repo add --username ${DEPLOY_USERNAME} --password ${DEPLOY_PASSWORD} ${CI_PROJECT_NAME} ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/helm/stable
   script:
-    - helm package ./ -d ./dist
-    - helm cm-push $(ls ./dist) ${CI_PROJECT_NAME}
+    - helm package .
+    - helm cm-push . ${CI_PROJECT_NAME}
