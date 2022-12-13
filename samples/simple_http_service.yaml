@@ -1,0 +1,27 @@
+deployments:
+  nginx-example:
+    revisionHistoryLimit: 0
+    image: 'nginx:1.23.1'
+    port: 80
+    domain: 192.168.39.254.nip.io
+    configmapSuffix: html
+    configPath: '/usr/share/nginx/html'
+    configs:
+      'index.html': |
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <title>Hello, world!</title>
+        </head>
+        <body>
+          <h1>Hello, world!</h1>
+          <div>This is example of YAUHC deployment</div>
+        </body>
+        </html>
+    resources:
+      limits:
+        cpu: 300m
+        memory: 256M
+      requests:
+        cpu: 300m
+        memory: 256M

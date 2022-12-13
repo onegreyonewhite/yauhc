@@ -5,9 +5,9 @@
 {{- $release := .Release -}}
 {{- $chart := .Chart -}}
 {{- $endpoints := (list) -}}
-{{ range $name, $deployment := .Values.deployments }}
-{{- $_ := set $deployment "name" $name -}}
-{{- $_ = set $deployment "generic" $generic -}}
+{{ range $name, $deployment_data := .Values.deployments }}
+{{- $deployment := merge (dict "name" $name ) $deployment_data -}}
+{{- $_ := set $deployment "generic" $generic -}}
 {{- $_ = set $deployment "global" $global -}}
 {{- $_ = set $deployment "Release" $release -}}
 {{- $_ = set $deployment "Chart" $chart -}}
@@ -28,8 +28,8 @@
 {{- $ingressMap := dict "path" "/" "name" $deployment.name "port" $appPort }}
 
 {{- if and $deployment.name $appPort $deployment.domain }}
-{{- $_ = set $deployment "serviceMap" (list $ingressMap) }}
-{{ include "yauhc.ingress.tpl" $deployment }}
+{{- $ingress := merge (dict "serviceMap" (list $ingressMap) ) $deployment }}
+{{ include "yauhc.ingress.tpl" $ingress }}
 {{- end }}
 
 {{- if and ($deployment.name) ($appPort) ($deployment.endpointPath) }}
@@ -38,6 +38,7 @@
 
 {{ end }}
 
+{{- if .Values.multi_endpoint }}
 {{- $ingress := .Values.multi_endpoint }}
 {{- $_ := set $ingress "name" (printf "endpoints-%s" .Release.Name) }}
 {{- $_ = set $ingress "global" $global }}
@@ -48,3 +49,4 @@
 {{- $_ = set $ingress "Capabilities" $capabilities -}}
 {{- $_ = set $ingress "serviceMap" $endpoints }}
 {{ include "yauhc.ingress.tpl" $ingress }}
+{{- end }}

@@ -14,7 +14,9 @@ metadata:
   labels:
     app: {{ $appName }}
 data:
-  {{ $appConfigs }}
+  {{- range $file, $content := fromYaml $appConfigs }}
+  {{ $file }}: | {{- $content | nindent 4 }}
+  {{- end }}
 {{- end }}
 {{- end }}
 {{- define "yauhc.configmap" -}}
