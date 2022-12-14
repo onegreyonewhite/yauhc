@@ -10,7 +10,7 @@ Core Philosophy: fewer parameters - faster setup.
 ```bash
 helm repo add yauhc https://gitlab.com/api/v4/projects/40345586/packages/helm/stable
 helm repo update
-helm upgrade project yauhc -f ./values.yaml --install --wait
+helm upgrade project YAUCH -f ./values.yaml --install --wait
 ```
 
 Where:
@@ -77,3 +77,4 @@ For deployments with `port` parameter automatically creates service with same po
 - `samples/simple_http_service.yaml` - An example of how to deploy a simple http service without tls but with QoS.
 - `samples/simple_https_microservices.yaml` - An example of how to deploy multiple services and connect
   them in one endpoint behind an https proxy (with cert-manager and issuer installed).
+- `samples/wrap_external_services.yaml` - An example with deployment only services and ingress without payload.

@@ -22,7 +22,9 @@
 {{ include "yauhc.configmap.tpl" $deployment }}
 {{- end }}
 
+{{- if not ($deployment.external) }}
 {{ include "yauhc.service.tpl" $deployment }}
+{{- end }}
 
 {{- $appPort :=  (include "yauhc.util.selecter" (list $deployment.port $generic.port $global.port)) }}
 {{- $ingressMap := dict "path" "/" "name" $deployment.name "port" $appPort }}

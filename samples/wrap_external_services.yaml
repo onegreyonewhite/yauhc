@@ -1,0 +1,14 @@
+deployments:
+  # All services must be deployed  with same names
+  external-service-1:
+    port: 9000
+    endpointPath: /service1/
+    external: true
+
+  external-service-2:
+    port: 3000
+    endpointPath: /service2/
+    external: true
+
+multi_endpoint:
+  domain: 192.168.39.254.nip.io
