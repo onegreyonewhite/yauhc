@@ -114,7 +114,7 @@ spec:
           {{- end }}
           {{- with fromYaml (include "yauhc.util.merger" (list $app.env $generic.env (dict ))) }}
           env:
-            {{- range $name, $value := fromYaml . }}
+            {{- range $name, $value := . }}
             - name: {{ $name }}
               value: {{ $value | quote }}
             {{- end }}

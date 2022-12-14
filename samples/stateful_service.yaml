@@ -9,6 +9,8 @@ deployments:
       resources:
         requests:
           storage: 10Mi
+    env:
+      NGINX_ENTRYPOINT_QUIET_LOGS: 1
     configmapSuffix: html
     configPath: '/usr/share/nginx/html'
     configs:
