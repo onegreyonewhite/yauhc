@@ -22,6 +22,14 @@
 {{- end -}}
 {{- end -}}
 
+{{- define "capabilities.statefulset.apiVersion" -}}
+{{- if semverCompare "<1.14-0" (include "capabilities.kubeVersion" $) -}}
+{{- print "apps/v1beta1" -}}
+{{- else -}}
+{{- print "apps/v1" -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "capabilities.ingress.apiVersion" -}}
 {{- if semverCompare "<1.14-0" (include "capabilities.kubeVersion" $) -}}
 {{- print "extensions/v1beta1" -}}

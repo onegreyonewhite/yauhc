@@ -2,6 +2,13 @@
 global: {}
 generic:
   enable: true
+  apiVersion: apps/v1
+  volumes: {}
+  volumeSpec:
+    accessModes: [ "ReadWriteOnce" ]
+    resources:
+      requests:
+        storage: 1Gi
 
 deployments: {}
 

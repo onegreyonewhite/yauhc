@@ -8,14 +8,29 @@
 {{- $appLabels := dict "app" $appName -}}
 {{- $configmapExt := (include "yauhc.util.selecter" (list $app.configmapSuffix $generic.configmapSuffix $global.configmapSuffix "settings")) -}}
 {{- $configmapMountPath := (include "yauhc.util.selecter" (list $app.configPath $generic.configPath $global.configPath (printf "/etc/%s" $appName ))) -}}
+{{- $kind := (include "yauhc.util.selecter" (list $app.kind $generic.kind $global.kind)) -}}
 {{- $appConfigs := (include "yauhc.util.merger" (list $app.configs $generic.configs $global.configs)) -}}
+{{- $appVolumes := fromYaml (include "yauhc.util.merger" (list $app.volumes $generic.volumes $global.volumes)) -}}
 {{- $containerAnnotations := dict -}}
 {{- with $appConfigs -}}
 {{- $_ := set $containerAnnotations "checksum/config" (toJson $appConfigs | sha256sum) -}}
 {{- end -}}
+{{- if not $kind -}}
+{{- if $appVolumes -}}
+{{ $kind = "StatefulSet" }}
+{{- else -}}
+{{ $kind = "Deployment" }}
+{{- end -}}
+{{- end -}}
 ---
+{{- if eq $kind "Deployment" }}
 apiVersion: {{ include "capabilities.deployment.apiVersion" $ }}
-kind: Deployment
+{{- else if eq $kind "StatefulSet" }}
+apiVersion: {{ include "capabilities.statefulset.apiVersion" $ }}
+{{- else }}
+apiVersion: {{ (include "yauhc.util.selecter" (list $app.apiVersion $generic.apiVersion $global.apiVersion )) }}
+{{- end }}
+kind: {{ $kind }}
 metadata:
   name: {{ $appName }}
   labels:
@@ -27,6 +42,9 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+  {{- if eq $kind "StatefulSet"}}
+  serviceName: {{ $appName }}
+  {{- end }}
   {{- with (include "yauhc.util.selecter" (list $app.revisionHistoryLimit $generic.revisionHistoryLimit $global.revisionHistoryLimit)) }}
   revisionHistoryLimit: {{ . }}
   {{- end }}
@@ -40,6 +58,17 @@ spec:
   strategy:
       {{- . | nindent 4 }}
   {{- end }}
+  {{- if and $appVolumes (eq $kind "StatefulSet") }}
+  {{- range $name, $path := $appVolumes }}
+  volumeClaimTemplates:
+    - metadata:
+        name: {{ $appName }}-{{ $name }}-data
+      {{- with fromYaml (include "yauhc.util.merger" (list $app.volumeSpec $generic.volumeSpec (dict ))) }}
+      spec:
+          {{- toYaml . | nindent 8}}
+      {{- end }}
+  {{- end }}
+  {{- end }}
   template:
     metadata:
       {{- with fromYaml (include "yauhc.util.merger" (list $containerAnnotations $app.annotations $generic.annotations $global.annotations)) }}
@@ -51,11 +80,25 @@ spec:
             {{- toYaml . | nindent 8 -}}
         {{- end}}
     spec:
-      {{- if $appConfigs }}
+      {{- if or $appConfigs (and $appVolumes (ne $kind "StatefulSet")) }}
       volumes:
+        {{- if $appConfigs }}
         - name: {{ $appName }}-configmap
           configMap:
             name: {{ $appName }}-configmap-{{ $configmapExt }}
+        {{- end }}
+        {{- if ne $kind "StatefulSet" }}
+        {{- range $name, $path := $appVolumes }}
+        - name: {{ $appName }}-{{ $name }}-data
+          {{- if eq $kind "Daemonset" }}
+          hostPath:
+            path: {{ $path }}
+          {{- else if eq $kind "Deployment" }}
+          persistentVolumeClaim:
+            claimName: {{ $appName }}-{{ $name }}-volume
+          {{- end }}
+        {{- end }}
+        {{- end }}
       {{- end }}
       {{- with (include "yauhc.util.selecter" (list $app.imagePullSecrets $generic.imagePullSecrets $global.imagePullSecrets)) }}
       imagePullSecrets:
@@ -76,11 +119,17 @@ spec:
               value: {{ $value | quote }}
             {{- end }}
           {{- end }}
-          {{- if $appConfigs }}
+          {{- if or $appConfigs $appVolumes }}
           volumeMounts:
+            {{- with $appConfigs }}
             - name: {{ $appName }}-configmap
               mountPath: {{ $configmapMountPath }}
               readOnly: true
+            {{- end }}
+            {{- range $name, $path := $appVolumes }}
+            - name: {{ $appName }}-{{ $name }}-data
+              mountPath: {{ $path }}
+            {{- end }}
           {{- end }}
           {{- with fromYaml (include "yauhc.util.merger" (list $app.readinessProbe $generic.readinessProbe $global.readinessProbe)) }}
           readinessProbe: {{ toYaml . | nindent 12}}
