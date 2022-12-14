@@ -38,7 +38,7 @@ This takes an array of three values and return result.
 {{- $val := (index . 0) | default (dict ) -}}
 {{- $generic := (index . 1) | default (dict ) -}}
 {{- $global := (index . 2) | default (dict ) -}}
-{{- $result := merge $val $generic $global -}}
+{{- $result := merge (deepCopy $val) (deepCopy $generic) (deepCopy $global) -}}
 {{- if $result -}}
 {{- toYaml $result -}}
 {{- end -}}

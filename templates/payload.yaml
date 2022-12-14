@@ -14,9 +14,9 @@
 {{- $_ = set $deployment "Values" $values -}}
 {{- $_ = set $deployment "Capabilities" $capabilities -}}
 
-{{ include "yauhc.deployment.tpl" $deployment }}
+{{ include "yauhc.deployment.tpl" (deepCopy $deployment) }}
 
-{{- $appConfigs := (include "yauhc.util.merger" (list $deployment.configs $generic.configs $global.configs)) }}
+{{- $appConfigs := fromYaml (include "yauhc.util.merger" (list $deployment.configs $generic.configs $global.configs)) }}
 
 {{- with $appConfigs }}
 {{ include "yauhc.configmap.tpl" $deployment }}
@@ -35,13 +35,13 @@
 {{- end }}
 
 {{- if and ($deployment.name) ($appPort) ($deployment.endpointPath) }}
-{{- $endpoints = concat $endpoints (list (merge (dict "path" $deployment.endpointPath) $ingressMap)) }}
+{{- $endpoints = concat $endpoints (list (merge (dict "path" $deployment.endpointPath) (deepCopy $ingressMap))) }}
 {{- end }}
 
 {{ end }}
 
 {{- if .Values.multi_endpoint }}
-{{- $ingress := .Values.multi_endpoint }}
+{{- $ingress := deepCopy .Values.multi_endpoint }}
 {{- $_ := set $ingress "name" (printf "endpoints-%s" .Release.Name) }}
 {{- $_ = set $ingress "global" $global }}
 {{- $_ = set $ingress "generic" $generic }}

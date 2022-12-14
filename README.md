@@ -49,7 +49,8 @@ For deployments with `port` parameter automatically creates service with same po
 | `strategy`                      | no       | yes     | Deployment strategy.                                         | `{}`                                       |
 | `terminationGracePeriodSeconds` | no       | yes     | Integer setting the termination grace period for the pods.   | `30`                                       |
 | `imagePullPolicy`               | no       | yes     | Docker image pull policy.                                    | `'IfNotPresent'`                           |
-| `command`                       | no       | yes     | Container command override (list or string).                 | `[]`                                       |
+| `command`                       | no       | yes     | Container command override (list).                           | `[]`                                       |
+| `args`                          | no       | yes     | Container args override (list).                              | `[]`                                       |
 | `env`                           | no       | yes     | Dict of extra environment variables.                         | `{}`                                       |
 | `readinessProbe`                | no       | yes     | Readiness probe object for container.                        | `{}`                                       |
 | `livenessProbe`                 | no       | yes     | Liveness probe object for container.                         | `{}`                                       |

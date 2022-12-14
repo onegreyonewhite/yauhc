@@ -1,0 +1,24 @@
+generic:
+  image: hashicorp/http-echo:0.2.3
+  port: 5678
+
+multi_endpoint:
+  domain: api.example.com
+
+deployments:
+  svc1:
+    args:
+      - '-text="{"Name": "Service 1"}"'
+    endpointPath: /service1/
+
+  svc2:
+    args:
+      - '-text="{"Name": "Service 2"}"'
+    endpointPath: /service1/
+
+  svc3:
+    args:
+    - '-listen=:8080'
+    - '-text="{"Name": "Service 3"}""'
+    port: 8080
+    endpointPath: /service1/

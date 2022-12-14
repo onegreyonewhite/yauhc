@@ -15,12 +15,11 @@
 {{- with $appConfigs -}}
 {{- $_ := set $containerAnnotations "checksum/config" (toJson $appConfigs | sha256sum) -}}
 {{- end -}}
-{{- if not $kind -}}
-{{- if $appVolumes -}}
-{{ $kind = "StatefulSet" }}
-{{- else -}}
-{{ $kind = "Deployment" }}
+{{- if and $appVolumes (not $kind) -}}
+{{- $kind = "StatefulSet" -}}
 {{- end -}}
+{{- if not $kind -}}
+{{- $kind = "Deployment" -}}
 {{- end -}}
 ---
 {{- if eq $kind "Deployment" }}
@@ -109,8 +108,11 @@ spec:
         - name: {{ $appName }}
           imagePullPolicy: {{ include "yauhc.util.selecter" (list $app.imagePullPolicy $generic.imagePullPolicy $global.imagePullPolicy "IfNotPresent") }}
           image: {{ $appImage }}
-          {{- with (include "yauhc.util.selecter" (list $app.command $generic.command $global.command)) }}
-          command: {{ . }}
+          {{- if $app.command }}
+          command: {{ $app.command | toJson }}
+          {{- end }}
+          {{- if $app.args }}
+          args: {{ $app.args | toJson }}
           {{- end }}
           {{- with fromYaml (include "yauhc.util.merger" (list $app.env $generic.env (dict ))) }}
           env:
