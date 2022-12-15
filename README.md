@@ -37,6 +37,12 @@ Deployment's pods updates their annotations when content of configmaps updates t
 parameter but have configs only configmap will be deployed. Without `configs` and `image` nothing will be deployed.
 For deployments with `port` parameter automatically creates service with same port and same selector.
 
+If kind is not set explicitly, then it will be chosen according to the following principle:
+1. If there are volumes, the `StatefulSet` will be selected.
+2. If there are no volumes, then `Deployment` will be selected.
+
+You can also choose `DaemonSet` , but for them the volumes will match the path on the node.
+
 
 | Name                            | Required | Generic | Description                                                  | Value                                      |
 |---------------------------------|----------|---------|--------------------------------------------------------------|--------------------------------------------|
@@ -68,6 +74,9 @@ For deployments with `port` parameter automatically creates service with same po
 | `domain`                        | no       | yes     | Domain name for deployment's ingress.                        | `''`                                       |
 | `issuer`                        | no       | yes     | Name of cert-manager's issuer for ingress tls.               | `''`                                       |
 | `endpointPath`                  | no       | yes     | Name of path for microservice style ingress.                 | `''`                                       |
+| `kind`                          | no       | yes     | Kind of container deployment.                                | `''`                                       |
+| `volumes`                       | no       | yes     | Mapping with name of volume as key and mount path as value.  | `{}`                                       |
+| `volumeSpec`                    | no       | yes     | Persistent volume claim spec for all volumes.                | `{}`                                       |
 
 #### Examples
 
