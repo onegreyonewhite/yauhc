@@ -18,6 +18,10 @@ deployments:
           <div>This is example of YAUHC deployment</div>
         </body>
         </html>
+      'index.yml':
+        test:
+          yaml:
+            data: true
     resources:
       limits:
         cpu: 300m

@@ -15,7 +15,11 @@ metadata:
     app: {{ $appName }}
 data:
   {{- range $file, $content := fromYaml $appConfigs }}
+  {{- if kindIs "string" $content }}
   {{ $file }}: | {{- $content | nindent 4 }}
+  {{- else if kindIs "map" $content }}
+  {{ $file }}: | {{- toYaml $content | nindent 4 }}
+  {{- end }}
   {{- end }}
 {{- end }}
 {{- end }}
