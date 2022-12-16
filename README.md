@@ -72,6 +72,7 @@ You can also choose `DaemonSet` , but for them the volumes will match the path o
 | `portType`                      | no       | yes     | Type of a service.                                           | ``                                         |
 | `serviceAnnotations`            | no       | yes     | Annotations to add to services for deployment.               | `{}`                                       |
 | `domain`                        | no       | yes     | Domain name for deployment's ingress.                        | `''`                                       |
+| `domainPrefixed`                | no       | no      | Setup name as subdomain for ingress endpoint.                | `false`                                    |
 | `issuer`                        | no       | yes     | Name of cert-manager's issuer for ingress tls.               | `''`                                       |
 | `endpointPath`                  | no       | yes     | Name of path for microservice style ingress.                 | `''`                                       |
 | `kind`                          | no       | yes     | Kind of container deployment.                                | `''`                                       |

@@ -42,13 +42,15 @@
 
 {{- if .Values.multi_endpoint }}
 {{- $ingress := deepCopy .Values.multi_endpoint }}
-{{- $_ := set $ingress "name" (printf "endpoints-%s" .Release.Name) }}
-{{- $_ = set $ingress "global" $global }}
+{{- $_ := set $ingress "global" $global }}
 {{- $_ = set $ingress "generic" $generic }}
 {{- $_ = set $ingress "Release" $release -}}
 {{- $_ = set $ingress "Chart" $chart -}}
 {{- $_ = set $ingress "Values" $values -}}
 {{- $_ = set $ingress "Capabilities" $capabilities -}}
 {{- $_ = set $ingress "serviceMap" $endpoints }}
+{{- if not $ingress.name }}
+{{- $_ = set $ingress "name" (printf "endpoints-%s" .Release.Name) }}
+{{- end }}
 {{ include "yauhc.ingress.tpl" $ingress }}
 {{- end }}

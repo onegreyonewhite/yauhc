@@ -5,7 +5,10 @@ generic:
 multi_endpoint:
   # Must be deployed manually
   issuer: le-test-issuer
-  domain: api.example.com
+  # If's not uncommented this will be 'endpoints-[.Release.Name].example.com'
+  # name: api
+  domain: example.com
+  domainPrefixed: true
 
 deployments:
   svc1:

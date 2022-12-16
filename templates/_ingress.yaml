@@ -16,6 +16,9 @@
 {{- end -}}
 {{- end -}}
 {{- if and ($appDomain) ($appName) ($appPaths) }}
+{{- if $app.domainPrefixed -}}
+{{- $appDomain = (printf "%s.%s" $appName $appDomain) -}}
+{{- end -}}
 ---
 apiVersion: {{ include "capabilities.ingress.apiVersion" $ }}
 kind: Ingress
