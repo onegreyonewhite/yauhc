@@ -5,7 +5,7 @@
 {{- $appConfigs := (include "yauhc.util.merger" (list $app.configs $generic.configs $global.configs)) -}}
 {{- $appName := $app.name -}}
 {{- $configmapExt := (include "yauhc.util.selecter" (list $app.configmapSuffix $generic.configmapSuffix $global.configmapSuffix "settings")) -}}
-{{- if and ($appName) ($appConfigs) }}
+{{- if and ($appName) ($appConfigs) (not $app.external) }}
 ---
 apiVersion: v1
 kind: ConfigMap
